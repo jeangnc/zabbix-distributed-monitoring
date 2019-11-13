@@ -39,23 +39,9 @@ services:
       zabbix-cluster:
         ipv4_address: 10.5.0.4
     ports:
-      - "8090:80"
+      - "8080:80"
     depends_on:
       - postgres
-      - zabbix-server
-
-  zabbix-proxy:
-    image: zabbix/zabbix-proxy-sqlite3:latest
-    environment:
-      ZBX_HOSTNAME: proxy1
-      ZBX_SERVER_HOST: zabbix-server
-      ZBX_DEBUGLEVEL: 3
-    networks:
-      zabbix-cluster:
-      external-network:
-        ipv4_address: 10.6.0.2
-    depends_on:
-      - zabbix-server
 
   client1:
     image: jeangnc/monitored-client:latest
@@ -63,8 +49,8 @@ services:
       context: .
       dockerfile: Dockerfile
     networks:
-      external-network:
-        ipv4_address: 10.6.0.3
+      zabbix-cluster:
+        ipv4_address: 10.5.0.100
 
   client2:
     image: jeangnc/monitored-client:latest
@@ -72,16 +58,11 @@ services:
       context: .
       dockerfile: Dockerfile
     networks:
-      external-network:
-        ipv4_address: 10.6.0.4
+      zabbix-cluster:
+        ipv4_address: 10.5.0.101
 
 networks:
   zabbix-cluster:
     ipam:
       config:
         - subnet: 10.5.0.0/24
-
-  external-network:
-    ipam:
-      config:
-        - subnet: 10.6.0.0/24
